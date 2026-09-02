@@ -1,7 +1,12 @@
 .data
 
-    myplaintext: .string "AMO ASSEMBLY"
-    mychypher: .string "E"
+    # test inversione
+    # myplaintext: .string "BUONANOTTE"
+    # mychypher: .string "E"
+
+    # test dizionario
+    # myplaintext: .string "myStr0ng P4ssW_"
+    # mychypher: .string "D"
     
     newline: .string "\n"
 
@@ -13,19 +18,19 @@ cipher_loop:
     lbu s1, 0(s0)           # carico il carattere corrente di mycypher
     beqz s1, end_program
 
-    li t0, 65               # 'A'
+    li t0, 65               # A
     beq s1, t0, call_substitution
 
-    li t0, 66               # 'B'
+    li t0, 66               # B
     beq s1, t0, call_blocks
 
-    li t0, 67               # 'C'
+    li t0, 67               # C
     beq s1, t0, call_occurrences
 
-    li t0, 68               # 'D'
+    li t0, 68               # D
     beq s1, t0, call_dictionary
 
-    li t0, 69               # 'E'
+    li t0, 69               # E
     beq s1, t0, call_inversion
 
     j next_char
@@ -114,5 +119,54 @@ blocks_c:
     ret
 occurrences_c:
     ret
+
 dictionary_c:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    mv t0, a0
+
+dict_enc:
+    lbu t1, 0(t0)
+    beqz t1, dict_end_enc
+
+    # controllo numeri
+    li t2, 48
+    blt t1, t2, skip_mod    # se carattere < 48 è un simbolo, ignoro
+    li t2, 57
+    ble t1, t2, is_number   # se carattere <= 57 è un numero
+
+    # controllo maiuscole
+    li t2, 65
+    blt t1, t2, skip_mod    # se 58 < c > 64, simbolo, ignoro
+    li t2, 90
+    ble t1, t2, is_letter   # se carattere <= 90 è una maiuscola
+
+    # controllo minuscole
+    li t2, 97
+    blt t1, t2, skip_mod    # se 91 < c > 96, simbolo, ignoro
+    li t2, 122
+    ble t1, t2, is_letter   # se <= 122 è una minuscola
+
+    j skip_mod              # saltiamo poiché se > 122 si tratta sempre di un simbolo
+
+is_number:
+    li t2, 105
+    sub t1, t2, t1
+    sb t1, 0(t0)
+    j skip_mod
+
+is_letter:
+    li t2, 187
+    sub t1, t2, t1
+    sb t1, 0(t0)
+
+skip_mod:
+    addi t0, t0, 1
+    j dict_enc
+
+dict_end_enc:
+    lw ra, 0(sp)
+    addi sp, sp, 4
     ret
+

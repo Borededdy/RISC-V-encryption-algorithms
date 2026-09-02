@@ -1,2 +1,2 @@
-# RISC-V-Linked-Lists
-Implementation of a simple linked list management in RISC-V, based on Ripes (2.2.5)
+# RISC-V-encryption-algorithms
+Simple collection of encryption algorithms in RISC-V using RIPES (v2.2.6)
